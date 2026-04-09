@@ -1,7 +1,130 @@
-<!DOCTYPE web-app PUBLIC
- "-//Sun Microsystems, Inc.//DTD Web Application 2.3//EN"
- "http://java.sun.com/dtd/web-app_2_3.dtd" >
+<?xml version="1.0" encoding="UTF-8"?>
+<web-app xmlns="http://xmlns.jcp.org/xml/ns/javaee"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/javaee 
+         http://xmlns.jcp.org/xml/ns/javaee/web-app_3_1.xsd"
+         version="3.1">
 
-<web-app>
-  <display-name>Archetype Created Web Application</display-name>
+  <display-name>Horizontes Sin Limites</display-name>
+
+  <!-- Filtro CORS para permitir peticiones desde Angular -->
+  <filter>
+    <filter-name>CorsFilter</filter-name>
+    <filter-class>com.horizontes.filters.CorsFilter</filter-class>
+  </filter>
+  <filter-mapping>
+    <filter-name>CorsFilter</filter-name>
+    <url-pattern>/api/*</url-pattern>
+  </filter-mapping>
+
+  <!-- Servlets de Autenticacion -->
+  <servlet>
+    <servlet-name>LoginServlet</servlet-name>
+    <servlet-class>com.horizontes.servlets.LoginServlet</servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>LoginServlet</servlet-name>
+    <url-pattern>/api/login</url-pattern>
+  </servlet-mapping>
+
+  <!-- Servlets de Usuarios -->
+  <servlet>
+    <servlet-name>UsuarioServlet</servlet-name>
+    <servlet-class>com.horizontes.servlets.UsuarioServlet</servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>UsuarioServlet</servlet-name>
+    <url-pattern>/api/usuarios/*</url-pattern>
+  </servlet-mapping>
+
+  <!-- Servlets de Destinos -->
+  <servlet>
+    <servlet-name>DestinoServlet</servlet-name>
+    <servlet-class>com.horizontes.servlets.DestinoServlet</servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>DestinoServlet</servlet-name>
+    <url-pattern>/api/destinos/*</url-pattern>
+  </servlet-mapping>
+
+  <!-- Servlets de Proveedores -->
+  <servlet>
+    <servlet-name>ProveedorServlet</servlet-name>
+    <servlet-class>com.horizontes.servlets.ProveedorServlet</servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>ProveedorServlet</servlet-name>
+    <url-pattern>/api/proveedores/*</url-pattern>
+  </servlet-mapping>
+
+  <!-- Servlets de Paquetes -->
+  <servlet>
+    <servlet-name>PaqueteServlet</servlet-name>
+    <servlet-class>com.horizontes.servlets.PaqueteServlet</servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>PaqueteServlet</servlet-name>
+    <url-pattern>/api/paquetes/*</url-pattern>
+  </servlet-mapping>
+
+  <!-- Servlets de Clientes -->
+  <servlet>
+    <servlet-name>ClienteServlet</servlet-name>
+    <servlet-class>com.horizontes.servlets.ClienteServlet</servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>ClienteServlet</servlet-name>
+    <url-pattern>/api/clientes/*</url-pattern>
+  </servlet-mapping>
+
+  <!-- Servlets de Reservaciones -->
+  <servlet>
+    <servlet-name>ReservacionServlet</servlet-name>
+    <servlet-class>com.horizontes.servlets.ReservacionServlet</servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>ReservacionServlet</servlet-name>
+    <url-pattern>/api/reservaciones/*</url-pattern>
+  </servlet-mapping>
+
+  <!-- Servlets de Pagos -->
+  <servlet>
+    <servlet-name>PagoServlet</servlet-name>
+    <servlet-class>com.horizontes.servlets.PagoServlet</servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>PagoServlet</servlet-name>
+    <url-pattern>/api/pagos/*</url-pattern>
+  </servlet-mapping>
+
+  <!-- Servlets de Cancelaciones -->
+  <servlet>
+    <servlet-name>CancelacionServlet</servlet-name>
+    <servlet-class>com.horizontes.servlets.CancelacionServlet</servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>CancelacionServlet</servlet-name>
+    <url-pattern>/api/cancelaciones/*</url-pattern>
+  </servlet-mapping>
+
+  <!-- Servlets de Reportes -->
+  <servlet>
+    <servlet-name>ReporteServlet</servlet-name>
+    <servlet-class>com.horizontes.servlets.ReporteServlet</servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>ReporteServlet</servlet-name>
+    <url-pattern>/api/reportes/*</url-pattern>
+  </servlet-mapping>
+
+  <!-- Servlets de Carga de Datos -->
+  <servlet>
+    <servlet-name>CargaServlet</servlet-name>
+    <servlet-class>com.horizontes.servlets.CargaServlet</servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>CargaServlet</servlet-name>
+    <url-pattern>/api/carga/*</url-pattern>
+  </servlet-mapping>
+
 </web-app>
