@@ -1,0 +1,26 @@
+<div class="login-container">
+  <div class="login-card">
+    <div class="login-header">
+      <h1>🌍 Horizontes sin Límites</h1>
+      <p>Sistema de Gestión de Viajes</p>
+    </div>
+
+    <div class="login-body">
+      <div class="form-group">
+        <label>Usuario</label>
+        <input type="text" [(ngModel)]="nombre" placeholder="Ingresa tu usuario"
+               (keyup.enter)="login()" />
+      </div>
+
+      <div class="form-group">
+        <label>Contraseña</label>
+        <input type="password" [(ngModel)]="password" placeholder="Ingresa tu contraseña"
+               (keyup.enter)="login()" />
+      </div>
+
+      <button class="btn-login" (click)="login()" [disabled]="cargando">
+        {{ cargando ? 'Iniciando sesión...' : 'Iniciar Sesión' }}
+      </button>
+    </div>
+  </div>
+</div>
