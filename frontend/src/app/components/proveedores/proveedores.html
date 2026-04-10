@@ -1,1 +1,100 @@
-<p>proveedores works!</p>
+<div class="page-container">
+  <div class="page-header">
+    <div class="header-left">
+      <button class="btn-back" (click)="volver()">← Volver</button>
+      <h1>🏨 Gestión de Proveedores</h1>
+    </div>
+    <button class="btn-primary" (click)="abrirModal()">+ Nuevo Proveedor</button>
+  </div>
+
+  <div class="search-bar">
+    <input type="text" [(ngModel)]="busqueda" (ngModelChange)="filtrar()"
+           placeholder="Buscar por nombre o país..." />
+  </div>
+
+  <div class="table-container">
+    @if (cargando) {
+      <div class="loading">Cargando proveedores...</div>
+    } @else if (proveedoresFiltrados.length === 0) {
+      <div class="empty">No hay proveedores registrados</div>
+    } @else {
+      <table>
+        <thead>
+          <tr>
+            <th>Nombre</th>
+            <th>Tipo</th>
+            <th>País</th>
+            <th>Contacto</th>
+            <th>Acciones</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (proveedor of proveedoresFiltrados; track proveedor.id) {
+            <tr>
+              <td><strong>{{ proveedor.nombre }}</strong></td>
+              <td>
+                <span class="badge">{{ getTipoTexto(proveedor.tipo) }}</span>
+              </td>
+              <td>{{ proveedor.pais }}</td>
+              <td>{{ proveedor.contacto }}</td>
+              <td class="actions">
+                <button class="btn-edit" (click)="abrirModal(proveedor)">✏️ Editar</button>
+                <button class="btn-delete" (click)="eliminar(proveedor)">🗑️ Eliminar</button>
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    }
+  </div>
+</div>
+
+@if (mostrarModal) {
+  <div class="modal-overlay" (click)="cerrarModal()">
+    <div class="modal" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h2>{{ modoEdicion ? 'Editar Proveedor' : 'Nuevo Proveedor' }}</h2>
+        <button class="btn-close" (click)="cerrarModal()">✕</button>
+      </div>
+
+      <div class="modal-body">
+        <div class="form-row">
+          <div class="form-group">
+            <label>Nombre *</label>
+            <input type="text" [(ngModel)]="proveedorForm.nombre"
+                   placeholder="Nombre del proveedor" />
+          </div>
+          <div class="form-group">
+            <label>Tipo de Servicio *</label>
+            <select [(ngModel)]="proveedorForm.tipo">
+              <option value="">Selecciona un tipo</option>
+              @for (tipo of tiposServicio; track tipo.id) {
+                <option [value]="tipo.id">{{ tipo.nombre }}</option>
+              }
+            </select>
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label>País de Operación</label>
+            <input type="text" [(ngModel)]="proveedorForm.pais"
+                   placeholder="País" />
+          </div>
+          <div class="form-group">
+            <label>Datos de Contacto</label>
+            <input type="text" [(ngModel)]="proveedorForm.contacto"
+                   placeholder="Teléfono, email, etc." />
+          </div>
+        </div>
+      </div>
+
+      <div class="modal-footer">
+        <button class="btn-secondary" (click)="cerrarModal()">Cancelar</button>
+        <button class="btn-primary" (click)="guardar()">
+          {{ modoEdicion ? 'Actualizar' : 'Guardar' }}
+        </button>
+      </div>
+    </div>
+  </div>
+}

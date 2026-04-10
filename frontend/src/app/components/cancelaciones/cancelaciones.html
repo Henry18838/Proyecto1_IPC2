@@ -1,1 +1,78 @@
-<p>cancelaciones works!</p>
+<div class="page-container">
+  <div class="page-header">
+    <div class="header-left">
+      <button class="btn-back" (click)="volver()">← Volver</button>
+      <h1>❌ Cancelaciones y Reembolsos</h1>
+    </div>
+  </div>
+
+  <!-- Buscar y procesar cancelacion -->
+  <div class="search-card">
+    <h3>Procesar Cancelación</h3>
+    <div class="search-row">
+      <input type="text" [(ngModel)]="numeroReservacion"
+             placeholder="Ej: RES-00001"
+             (keyup.enter)="buscarReservacion()" />
+      <button class="btn-primary" (click)="buscarReservacion()">🔍 Buscar</button>
+    </div>
+
+    @if (reservacion) {
+      <div class="reservacion-preview">
+        <div class="preview-info">
+          <p><strong>Reservación:</strong> {{ reservacion.numeroReservacion }}</p>
+          <p><strong>Paquete:</strong> {{ reservacion.paqueteNombre }}</p>
+          <p><strong>Fecha Viaje:</strong> {{ reservacion.fechaViaje | date:'dd/MM/yyyy' }}</p>
+          <p><strong>Costo Total:</strong> Q.{{ reservacion.costoTotal | number:'1.2-2' }}</p>
+          <p><strong>Estado:</strong> {{ getEstadoTexto(reservacion.estado) }}</p>
+        </div>
+
+        <div class="reembolso-info">
+          <h4>Política de Reembolso</h4>
+          <ul>
+            <li>Más de 30 días antes: <strong>100%</strong></li>
+            <li>Entre 15 y 30 días: <strong>70%</strong></li>
+            <li>Entre 7 y 14 días: <strong>40%</strong></li>
+            <li>Menos de 7 días: <strong>No permitido</strong></li>
+          </ul>
+        </div>
+
+        <button class="btn-danger" (click)="procesarCancelacion()">
+          ❌ Procesar Cancelación
+        </button>
+      </div>
+    }
+  </div>
+
+  <!-- Historial de cancelaciones -->
+  <div class="table-container">
+    <h3 class="table-title">Historial de Cancelaciones</h3>
+    @if (cargando) {
+      <div class="loading">Cargando cancelaciones...</div>
+    } @else if (cancelaciones.length === 0) {
+      <div class="empty">No hay cancelaciones registradas</div>
+    } @else {
+      <table>
+        <thead>
+          <tr>
+            <th>Reservación</th>
+            <th>Fecha Cancelación</th>
+            <th>% Reembolso</th>
+            <th>Monto Reembolsado</th>
+            <th>Pérdida Agencia</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (c of cancelaciones; track c.id) {
+            <tr>
+              <td><strong>{{ c.numeroReservacion }}</strong></td>
+              <td>{{ c.fechaCancelacion | date:'dd/MM/yyyy HH:mm' }}</td>
+              <td>{{ c.porcentajeReembolso }}%</td>
+              <td class="text-green">Q.{{ c.montoReembolsado | number:'1.2-2' }}</td>
+              <td class="text-red">Q.{{ c.perdidaAgencia | number:'1.2-2' }}</td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    }
+  </div>
+</div>

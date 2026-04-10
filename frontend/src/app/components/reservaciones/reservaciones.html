@@ -1,1 +1,164 @@
-<p>reservaciones works!</p>
+<div class="page-container">
+  <div class="page-header">
+    <div class="header-left">
+      <button class="btn-back" (click)="volver()">← Volver</button>
+      <h1>📋 Gestión de Reservaciones</h1>
+    </div>
+    <div class="header-actions">
+      <button [class]="soloDia ? 'btn-active' : 'btn-secondary'" (click)="toggleSoloDia()">
+        📅 {{ soloDia ? 'Ver Todas' : 'Solo Hoy' }}
+      </button>
+      <button class="btn-primary" (click)="abrirModal()">+ Nueva Reservación</button>
+    </div>
+  </div>
+
+  <div class="search-bar">
+    <input type="text" [(ngModel)]="busqueda" (ngModelChange)="filtrar()"
+           placeholder="Buscar por número, paquete o agente..." />
+  </div>
+
+  <div class="table-container">
+    @if (cargando) {
+      <div class="loading">Cargando reservaciones...</div>
+    } @else if (reservacionesFiltradas.length === 0) {
+      <div class="empty">No hay reservaciones registradas</div>
+    } @else {
+      <table>
+        <thead>
+          <tr>
+            <th>Número</th>
+            <th>Paquete</th>
+            <th>Agente</th>
+            <th>Fecha Viaje</th>
+            <th>Pasajeros</th>
+            <th>Costo Total</th>
+            <th>Estado</th>
+            <th>Acciones</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (r of reservacionesFiltradas; track r.id) {
+            <tr>
+              <td><strong>{{ r.numeroReservacion }}</strong></td>
+              <td>{{ r.paqueteNombre }}</td>
+              <td>{{ r.agenteNombre }}</td>
+              <td>{{ r.fechaViaje | date:'dd/MM/yyyy' }}</td>
+              <td>{{ r.cantidadPasajeros }}</td>
+              <td>Q.{{ r.costoTotal | number:'1.2-2' }}</td>
+              <td>
+                <span [class]="getEstadoClass(r.estado)">
+                  {{ getEstadoTexto(r.estado) }}
+                </span>
+              </td>
+              <td>
+                <button class="btn-info" (click)="verDetalle(r.numeroReservacion)">👁️ Ver</button>
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    }
+  </div>
+</div>
+
+<!-- Modal Nueva Reservacion -->
+@if (mostrarModal) {
+  <div class="modal-overlay" (click)="cerrarModal()">
+    <div class="modal" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h2>📋 Nueva Reservación</h2>
+        <button class="btn-close" (click)="cerrarModal()">✕</button>
+      </div>
+      <div class="modal-body">
+        <div class="form-row">
+          <div class="form-group">
+            <label>Paquete Turístico *</label>
+            <select [(ngModel)]="reservacionForm.paqueteId">
+              <option value="">Selecciona un paquete</option>
+              @for (paquete of paquetes; track paquete.id) {
+                <option [value]="paquete.id">
+                  {{ paquete.nombre }} - Q.{{ paquete.precioVenta }}
+                </option>
+              }
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Fecha de Viaje *</label>
+            <input type="date" [(ngModel)]="reservacionForm.fechaViaje" />
+          </div>
+        </div>
+
+        <div class="pasajeros-section">
+          <div class="pasajeros-header">
+            <h3>Pasajeros</h3>
+            <button class="btn-success" (click)="agregarPasajero()">+ Agregar</button>
+          </div>
+          @for (pasajero of reservacionForm.pasajeros; track $index) {
+            <div class="pasajero-row">
+              <input type="text" [(ngModel)]="pasajero.dpi"
+                     placeholder="DPI o Pasaporte del pasajero" />
+              @if (reservacionForm.pasajeros.length > 1) {
+                <button class="btn-delete" (click)="eliminarPasajero($index)">🗑️</button>
+              }
+            </div>
+          }
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn-secondary" (click)="cerrarModal()">Cancelar</button>
+        <button class="btn-primary" (click)="guardar()">Crear Reservación</button>
+      </div>
+    </div>
+  </div>
+}
+
+<!-- Modal Detalle -->
+@if (mostrarDetalle && reservacionDetalle) {
+  <div class="modal-overlay" (click)="cerrarDetalle()">
+    <div class="modal modal-large" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h2>👁️ Detalle de Reservación</h2>
+        <button class="btn-close" (click)="cerrarDetalle()">✕</button>
+      </div>
+      <div class="modal-body">
+        <div class="detalle-info">
+          <p><strong>Número:</strong> {{ reservacionDetalle.numeroReservacion }}</p>
+          <p><strong>Paquete:</strong> {{ reservacionDetalle.paqueteNombre }}</p>
+          <p><strong>Agente:</strong> {{ reservacionDetalle.agenteNombre }}</p>
+          <p><strong>Fecha Creación:</strong> {{ reservacionDetalle.fechaCreacion | date:'dd/MM/yyyy' }}</p>
+          <p><strong>Fecha Viaje:</strong> {{ reservacionDetalle.fechaViaje | date:'dd/MM/yyyy' }}</p>
+          <p><strong>Pasajeros:</strong> {{ reservacionDetalle.cantidadPasajeros }}</p>
+          <p><strong>Costo Total:</strong> Q.{{ reservacionDetalle.costoTotal | number:'1.2-2' }}</p>
+          <p><strong>Estado:</strong>
+            <span [class]="getEstadoClass(reservacionDetalle.estado)">
+              {{ getEstadoTexto(reservacionDetalle.estado) }}
+            </span>
+          </p>
+        </div>
+
+        <h3>Pasajeros</h3>
+        <table>
+          <thead>
+            <tr>
+              <th>DPI</th>
+              <th>Nombre</th>
+              <th>Nacionalidad</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (pasajero of reservacionDetalle.pasajeros; track pasajero.id) {
+              <tr>
+                <td>{{ pasajero.dpi }}</td>
+                <td>{{ pasajero.nombre }}</td>
+                <td>{{ pasajero.nacionalidad }}</td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+      <div class="modal-footer">
+        <button class="btn-secondary" (click)="cerrarDetalle()">Cerrar</button>
+      </div>
+    </div>
+  </div>
+}

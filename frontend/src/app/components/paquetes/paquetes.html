@@ -1,1 +1,199 @@
-<p>paquetes works!</p>
+<div class="page-container">
+  <div class="page-header">
+    <div class="header-left">
+      <button class="btn-back" (click)="volver()">← Volver</button>
+      <h1>✈️ Gestión de Paquetes</h1>
+    </div>
+    <button class="btn-primary" (click)="abrirModal()">+ Nuevo Paquete</button>
+  </div>
+
+  <div class="search-bar">
+    <input type="text" [(ngModel)]="busqueda" (ngModelChange)="filtrar()"
+           placeholder="Buscar por nombre o destino..." />
+  </div>
+
+  <div class="table-container">
+    @if (cargando) {
+      <div class="loading">Cargando paquetes...</div>
+    } @else if (paquetesFiltrados.length === 0) {
+      <div class="empty">No hay paquetes registrados</div>
+    } @else {
+      <table>
+        <thead>
+          <tr>
+            <th>Nombre</th>
+            <th>Destino</th>
+            <th>Duración</th>
+            <th>Precio</th>
+            <th>Capacidad</th>
+            <th>Estado</th>
+            <th>Acciones</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (paquete of paquetesFiltrados; track paquete.id) {
+            <tr>
+              <td><strong>{{ paquete.nombre }}</strong></td>
+              <td>{{ paquete.destinoNombre }}</td>
+              <td>{{ paquete.duracionDias }} días</td>
+              <td>Q.{{ paquete.precioVenta | number:'1.2-2' }}</td>
+              <td>{{ paquete.capacidadMaxima }} personas</td>
+              <td>
+                <span [class]="paquete.activo ? 'badge-active' : 'badge-inactive'">
+                  {{ paquete.activo ? 'Activo' : 'Inactivo' }}
+                </span>
+              </td>
+              <td class="actions">
+                <button class="btn-info" (click)="verDetalle(paquete)">👁️ Ver</button>
+                <button class="btn-edit" (click)="abrirModal(paquete)">✏️ Editar</button>
+                <button class="btn-success" (click)="abrirModalServicio(paquete)">➕ Servicio</button>
+                @if (paquete.activo) {
+                  <button class="btn-delete" (click)="desactivar(paquete)">🚫 Desactivar</button>
+                }
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    }
+  </div>
+</div>
+
+<!-- Modal Paquete -->
+@if (mostrarModal) {
+  <div class="modal-overlay" (click)="cerrarModal()">
+    <div class="modal" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h2>{{ modoEdicion ? 'Editar Paquete' : 'Nuevo Paquete' }}</h2>
+        <button class="btn-close" (click)="cerrarModal()">✕</button>
+      </div>
+      <div class="modal-body">
+        <div class="form-row">
+          <div class="form-group">
+            <label>Nombre *</label>
+            <input type="text" [(ngModel)]="paqueteForm.nombre" placeholder="Nombre del paquete" />
+          </div>
+          <div class="form-group">
+            <label>Destino *</label>
+            <select [(ngModel)]="paqueteForm.destinoId">
+              <option value="">Selecciona destino</option>
+              @for (destino of destinos; track destino.id) {
+                <option [value]="destino.id">{{ destino.nombre }}</option>
+              }
+            </select>
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>Duración (días) *</label>
+            <input type="number" [(ngModel)]="paqueteForm.duracionDias" placeholder="7" />
+          </div>
+          <div class="form-group">
+            <label>Precio de Venta *</label>
+            <input type="number" [(ngModel)]="paqueteForm.precioVenta" placeholder="0.00" />
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>Capacidad Máxima *</label>
+            <input type="number" [(ngModel)]="paqueteForm.capacidadMaxima" placeholder="20" />
+          </div>
+        </div>
+        <div class="form-group">
+          <label>Descripción</label>
+          <textarea [(ngModel)]="paqueteForm.descripcion" rows="3" placeholder="Descripción del paquete"></textarea>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn-secondary" (click)="cerrarModal()">Cancelar</button>
+        <button class="btn-primary" (click)="guardar()">
+          {{ modoEdicion ? 'Actualizar' : 'Guardar' }}
+        </button>
+      </div>
+    </div>
+  </div>
+}
+
+<!-- Modal Agregar Servicio -->
+@if (mostrarModalServicio) {
+  <div class="modal-overlay" (click)="cerrarModalServicio()">
+    <div class="modal" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h2>➕ Agregar Servicio</h2>
+        <button class="btn-close" (click)="cerrarModalServicio()">✕</button>
+      </div>
+      <div class="modal-body">
+        <div class="form-group">
+          <label>Proveedor *</label>
+          <select [(ngModel)]="servicioForm.proveedorId">
+            <option value="">Selecciona proveedor</option>
+            @for (proveedor of proveedores; track proveedor.id) {
+              <option [value]="proveedor.id">{{ proveedor.nombre }}</option>
+            }
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Descripción del Servicio</label>
+          <input type="text" [(ngModel)]="servicioForm.descripcion" placeholder="Ej: Vuelo redondo GUA-CUN" />
+        </div>
+        <div class="form-group">
+          <label>Costo para la Agencia *</label>
+          <input type="number" [(ngModel)]="servicioForm.costo" placeholder="0.00" />
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn-secondary" (click)="cerrarModalServicio()">Cancelar</button>
+        <button class="btn-primary" (click)="agregarServicio()">Agregar</button>
+      </div>
+    </div>
+  </div>
+}
+
+<!-- Modal Detalle -->
+@if (mostrarDetalle && paqueteSeleccionado) {
+  <div class="modal-overlay" (click)="cerrarDetalle()">
+    <div class="modal modal-large" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h2>👁️ Detalle del Paquete</h2>
+        <button class="btn-close" (click)="cerrarDetalle()">✕</button>
+      </div>
+      <div class="modal-body">
+        <div class="detalle-info">
+          <p><strong>Nombre:</strong> {{ paqueteSeleccionado.paquete?.nombre }}</p>
+          <p><strong>Destino:</strong> {{ paqueteSeleccionado.paquete?.destinoNombre }}</p>
+          <p><strong>Duración:</strong> {{ paqueteSeleccionado.paquete?.duracionDias }} días</p>
+          <p><strong>Precio de Venta:</strong> Q.{{ paqueteSeleccionado.paquete?.precioVenta | number:'1.2-2' }}</p>
+          <p><strong>Costo Agencia:</strong> Q.{{ paqueteSeleccionado.costoTotalAgencia | number:'1.2-2' }}</p>
+          <p><strong>Ganancia Bruta:</strong> Q.{{ paqueteSeleccionado.gananciaBruta | number:'1.2-2' }}</p>
+          <p><strong>Ocupación:</strong> {{ paqueteSeleccionado.porcentajeOcupacion }}%
+            @if (paqueteSeleccionado.altaDemanda) {
+              <span class="badge-alta-demanda">⚠️ Alta Demanda</span>
+            }
+          </p>
+        </div>
+        <h3>Servicios Incluidos</h3>
+        <table>
+          <thead>
+            <tr>
+              <th>Proveedor</th>
+              <th>Descripción</th>
+              <th>Costo</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (servicio of paqueteSeleccionado.paquete?.servicios; track servicio.id) {
+              <tr>
+                <td>{{ servicio.proveedorNombre }}</td>
+                <td>{{ servicio.descripcion }}</td>
+                <td>Q.{{ servicio.costo | number:'1.2-2' }}</td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+      <div class="modal-footer">
+        <button class="btn-secondary" (click)="cerrarDetalle()">Cerrar</button>
+      </div>
+    </div>
+  </div>
+}
