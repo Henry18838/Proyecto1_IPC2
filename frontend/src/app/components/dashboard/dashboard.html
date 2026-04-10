@@ -1,5 +1,45 @@
-<div>
-  <h1>Bienvenido {{ usuario?.nombre }}</h1>
-  <p>{{ getRolTexto() }}</p>
-  <button (click)="logout()">Cerrar Sesión</button>
+<div class="dashboard-container">
+  <!-- Sidebar -->
+  <div class="sidebar">
+    <div class="sidebar-header">
+      <h2>🌍 Horizontes</h2>
+      <p>sin Límites</p>
+    </div>
+
+    <nav class="sidebar-nav">
+      @for (item of menuItems; track item.ruta) {
+        <a [routerLink]="item.ruta" class="nav-item" routerLinkActive="active">
+          {{ item.label }}
+        </a>
+      }
+    </nav>
+
+    <div class="sidebar-footer">
+      <button class="btn-logout" (click)="logout()">🚪 Cerrar Sesión</button>
+    </div>
+  </div>
+
+  <!-- Contenido principal -->
+  <div class="main-content">
+    <div class="topbar">
+      <h1>Panel de Control</h1>
+      <div class="user-info">
+        <span class="user-name">{{ usuario?.nombre }}</span>
+        <span class="user-role">{{ getRolTexto() }}</span>
+      </div>
+    </div>
+
+    <div class="welcome-card">
+      <h2>Bienvenido, {{ usuario?.nombre }}! 👋</h2>
+      <p>Selecciona una opción del menú para comenzar.</p>
+      <div class="cards-grid">
+        @for (item of menuItems; track item.ruta) {
+          <div class="card" [routerLink]="item.ruta">
+            <span class="card-icon">{{ item.label.split(' ')[0] }}</span>
+            <span class="card-label">{{ item.label.split(' ').slice(1).join(' ') }}</span>
+          </div>
+        }
+      </div>
+    </div>
+  </div>
 </div>

@@ -1,1 +1,95 @@
-<p>destinos works!</p>
+<div class="page-container">
+  <div class="page-header">
+    <div class="header-left">
+      <button class="btn-back" (click)="volver()">← Volver</button>
+      <h1>🌍 Gestión de Destinos</h1>
+    </div>
+    <button class="btn-primary" (click)="abrirModal()">+ Nuevo Destino</button>
+  </div>
+
+  <div class="search-bar">
+    <input type="text" [(ngModel)]="busqueda" (ngModelChange)="filtrar()"
+           placeholder="Buscar por nombre o país..." />
+  </div>
+
+  <div class="table-container">
+    @if (cargando) {
+      <div class="loading">Cargando destinos...</div>
+    } @else if (destinosFiltrados.length === 0) {
+      <div class="empty">No hay destinos registrados</div>
+    } @else {
+      <table>
+        <thead>
+          <tr>
+            <th>Nombre</th>
+            <th>País</th>
+            <th>Descripción</th>
+            <th>Clima</th>
+            <th>Acciones</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (destino of destinosFiltrados; track destino.id) {
+            <tr>
+              <td><strong>{{ destino.nombre }}</strong></td>
+              <td>{{ destino.pais }}</td>
+              <td>{{ destino.descripcion }}</td>
+              <td>{{ destino.clima }}</td>
+              <td class="actions">
+                <button class="btn-edit" (click)="abrirModal(destino)">✏️ Editar</button>
+                <button class="btn-delete" (click)="eliminar(destino)">🗑️ Eliminar</button>
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    }
+  </div>
+</div>
+
+@if (mostrarModal) {
+  <div class="modal-overlay" (click)="cerrarModal()">
+    <div class="modal" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h2>{{ modoEdicion ? 'Editar Destino' : 'Nuevo Destino' }}</h2>
+        <button class="btn-close" (click)="cerrarModal()">✕</button>
+      </div>
+
+      <div class="modal-body">
+        <div class="form-row">
+          <div class="form-group">
+            <label>Nombre *</label>
+            <input type="text" [(ngModel)]="destinoForm.nombre" placeholder="Nombre del destino" />
+          </div>
+          <div class="form-group">
+            <label>País *</label>
+            <input type="text" [(ngModel)]="destinoForm.pais" placeholder="País" />
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label>Descripción</label>
+          <textarea [(ngModel)]="destinoForm.descripcion" placeholder="Descripción del destino" rows="3"></textarea>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label>Clima</label>
+            <input type="text" [(ngModel)]="destinoForm.clima" placeholder="Clima y mejor época" />
+          </div>
+          <div class="form-group">
+            <label>URL de imagen</label>
+            <input type="text" [(ngModel)]="destinoForm.imagenUrl" placeholder="https://..." />
+          </div>
+        </div>
+      </div>
+
+      <div class="modal-footer">
+        <button class="btn-secondary" (click)="cerrarModal()">Cancelar</button>
+        <button class="btn-primary" (click)="guardar()">
+          {{ modoEdicion ? 'Actualizar' : 'Guardar' }}
+        </button>
+      </div>
+    </div>
+  </div>
+}
