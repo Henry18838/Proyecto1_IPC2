@@ -1,1 +1,95 @@
-<p>carga works!</p>
+<div class="page-container">
+  <div class="page-header">
+    <div class="header-left">
+      <button class="btn-back" (click)="volver()">← Volver</button>
+      <h1>📂 Carga de Datos</h1>
+    </div>
+  </div>
+
+  <!-- Instrucciones -->
+  <div class="instrucciones-card">
+    <h3>📋 Instrucciones</h3>
+    <p>Selecciona un archivo <strong>.txt</strong> con las instrucciones de carga.
+       Las instrucciones válidas son:</p>
+    <div class="instrucciones-grid">
+      <span class="instruccion">USUARIO("nombre","password",rol)</span>
+      <span class="instruccion">DESTINO("nombre","pais","descripcion")</span>
+      <span class="instruccion">PROVEEDOR("nombre",tipo,"pais")</span>
+      <span class="instruccion">PAQUETE("nombre","destino",dias,precio,capacidad)</span>
+      <span class="instruccion">SERVICIO_PAQUETE("paquete","proveedor","desc",costo)</span>
+      <span class="instruccion">CLIENTE("dpi","nombre","fecha","tel","email","nac")</span>
+      <span class="instruccion">RESERVACION("paquete","usuario","fecha","dpis")</span>
+      <span class="instruccion">PAGO("reservacion",monto,metodo,"fecha")</span>
+    </div>
+  </div>
+
+  <!-- Cargar archivo -->
+  <div class="upload-card">
+    <h3>📁 Seleccionar Archivo</h3>
+
+    <div class="upload-area" (click)="fileInput.click()">
+      <input #fileInput type="file" accept=".txt"
+             (change)="seleccionarArchivo($event)" hidden />
+      @if (!archivoSeleccionado) {
+        <div class="upload-placeholder">
+          <span class="upload-icon">📂</span>
+          <p>Click para seleccionar archivo .txt</p>
+        </div>
+      } @else {
+        <div class="upload-selected">
+          <span class="upload-icon">📄</span>
+          <p><strong>{{ nombreArchivo }}</strong></p>
+          <p class="file-size">Archivo seleccionado</p>
+        </div>
+      }
+    </div>
+
+    <div class="upload-actions">
+      @if (archivoSeleccionado) {
+        <button class="btn-secondary" (click)="limpiar()">🗑️ Limpiar</button>
+      }
+      <button class="btn-primary" (click)="cargarArchivo()"
+              [disabled]="!archivoSeleccionado || cargando">
+        {{ cargando ? '⏳ Procesando...' : '🚀 Cargar Datos' }}
+      </button>
+    </div>
+  </div>
+
+  <!-- Resultado -->
+  @if (resultado) {
+    <div class="resultado-card">
+      <h3>📊 Resumen de Carga</h3>
+
+      <div class="resumen-grid">
+        @for (contador of getContadores(); track contador.tipo) {
+          <div class="resumen-item">
+            <span class="resumen-tipo">{{ contador.tipo }}</span>
+            <span class="resumen-cantidad">{{ contador.cantidad }}</span>
+          </div>
+        }
+        <div class="resumen-item resumen-total">
+          <span class="resumen-tipo">TOTAL</span>
+          <span class="resumen-cantidad">{{ getTotalRegistros() }}</span>
+        </div>
+      </div>
+
+      @if (resultado.totalErrores > 0) {
+        <div class="errores-section">
+          <h4>⚠️ Errores encontrados ({{ resultado.totalErrores }})</h4>
+          <div class="errores-lista">
+            @for (error of resultado.errores; track $index) {
+              <div class="error-item">
+                <span class="error-icon">❌</span>
+                <span class="error-msg">{{ error }}</span>
+              </div>
+            }
+          </div>
+        </div>
+      } @else {
+        <div class="success-msg">
+          ✅ Todos los registros fueron procesados correctamente
+        </div>
+      }
+    </div>
+  }
+</div>

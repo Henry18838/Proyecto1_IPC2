@@ -1,1 +1,96 @@
-<p>reportes works!</p>
+<div class="page-container">
+  <div class="page-header">
+    <div class="header-left">
+      <button class="btn-back" (click)="volver()">← Volver</button>
+      <h1>📊 Reportes Financieros</h1>
+    </div>
+  </div>
+
+  <!-- Filtros -->
+  <div class="filtros-card">
+    <h3>Configurar Reporte</h3>
+    <div class="filtros-row">
+      <div class="form-group">
+        <label>Tipo de Reporte *</label>
+        <select [(ngModel)]="tipoReporte">
+          <option value="">Selecciona un reporte</option>
+          @for (tipo of tiposReporte; track tipo.id) {
+            <option [value]="tipo.id">{{ tipo.nombre }}</option>
+          }
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Fecha Inicio</label>
+        <input type="date" [(ngModel)]="fechaInicio" />
+      </div>
+      <div class="form-group">
+        <label>Fecha Fin</label>
+        <input type="date" [(ngModel)]="fechaFin" />
+      </div>
+    </div>
+    <div class="filtros-actions">
+      <button class="btn-primary" (click)="generarReporte()" [disabled]="cargando">
+        {{ cargando ? 'Generando...' : '📊 Generar Reporte' }}
+      </button>
+      @if (resultado) {
+        <button class="btn-csv" (click)="descargarCSV()">
+          📥 Descargar CSV
+        </button>
+      }
+    </div>
+  </div>
+
+  <!-- Resultado -->
+  @if (cargando) {
+    <div class="loading-card">
+      <p>Generando reporte...</p>
+    </div>
+  }
+
+  @if (resultado) {
+    <div class="resultado-card">
+      <h3>{{ getTipoNombre() }}</h3>
+      @if (fechaInicio && fechaFin) {
+        <p class="periodo">Período: {{ fechaInicio }} al {{ fechaFin }}</p>
+      }
+
+      <!-- Si es una lista -->
+      @if (esLista()) {
+        @if (resultado.length === 0) {
+          <div class="empty">No hay datos para el período seleccionado</div>
+        } @else {
+          <table>
+            <thead>
+              <tr>
+                @for (key of getKeys(resultado[0]); track key) {
+                  <th>{{ key }}</th>
+                }
+              </tr>
+            </thead>
+            <tbody>
+              @for (fila of resultado; track $index) {
+                <tr>
+                  @for (key of getKeys(fila); track key) {
+                    <td>{{ fila[key] }}</td>
+                  }
+                </tr>
+              }
+            </tbody>
+          </table>
+        }
+      }
+
+      <!-- Si es un objeto -->
+      @if (esObjeto()) {
+        <div class="objeto-resultado">
+          @for (key of getKeys(resultado); track key) {
+            <div class="resultado-item">
+              <span class="resultado-label">{{ key }}</span>
+              <span class="resultado-value">{{ resultado[key] }}</span>
+            </div>
+          }
+        </div>
+      }
+    </div>
+  }
+</div>
